@@ -1,0 +1,94 @@
+﻿@model RottenTomatoesMoviesProject.Entity.Model.MoviesResponse
+@{
+    ViewData["Title"] = "Rotten Tomatoes Movies";
+}
+
+@using (@Html.BeginForm("Index", "Home", FormMethod.Post))
+{
+    <div class="input-group mb-3">
+        @Html.TextBox("q", "", new { @class = "form-control", @placeholder = "Search Movie" })
+        <div class="input-group-append">
+            <button type="submit" href="@Url.Action("Index", "Home", new { })" class="input-group-text text-dark" style="text-decoration: none">Search</button>
+        </div>
+    </div>
+}
+
+@if (@Model.movies != null)
+{
+    <ul class="list-unstyled">
+        @foreach (var item in @Model.movies)
+        {
+            <li class="media">
+                <img src="@item.posters.profile" class="mr-3" alt="@item.title">
+                <div class="media-body">
+                    <h5 class="mt-0 mb-1"><a href="@Url.Action("Detail", "Home", new { id = item.id })" class="text-dark" style="text-decoration: none">@item.title </a>(@item.year)</h5>
+                    <p>
+                        @foreach (var cast in item.abridged_cast)
+                        {
+                            @(cast.name + ", ")
+                        }
+                    </p>
+                    @if (item.synopsis != "" && item.synopsis.Length >= 400)
+                    {
+                        <p class="card-text" style="height: 140px;">@item.synopsis.Substring(0, 399) ...</p>
+                    }
+                    @if (item.synopsis != "" && item.synopsis.Length < 400)
+                    {
+                        <p class="card-text" style="height: 140px;">@item.synopsis</p>
+                    }
+                    @if (item.synopsis == "")
+                    {
+                        <p class="card-text" style="height: 140px;"></p>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+}
+
+<div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination pagination-sm justify-content-end">
+            <li class="page-item">
+                @if (@Model.page - 1 > 0)
+                {
+                    <a class="page-link" href="@Url.Action("Index", "home", new { page = @Model.page - 1})" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                }
+                else
+                {
+                    <span class="page-link" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </span>
+                }
+            </li>
+            @for (int i = @Model.page - 3; i < @Model.page; i++)
+            {
+                @if (i > 0)
+                {
+                    <li class="page-item"><a class="page-link" href="@Url.Action("Index", "home", new { page = i })">@i</a></li>
+                }
+            }
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">
+                    @Model.page
+                    <span class="sr-only">(current)</span>
+                </span>
+            </li>
+            @for (int i = @Model.page + 1; i < @Model.page + 4; i++)
+            {
+                @if (i < @Model.total)
+                {
+                    <li class="page-item"><a class="page-link" href="@Url.Action("Index", "home", new { page = i })">@i</a></li>
+                }
+
+            }
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("Index", "home", new { page = @Model.page + 1 })" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
